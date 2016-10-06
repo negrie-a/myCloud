@@ -1,0 +1,35 @@
+{
+  "name": "mycloud",
+  "version": "1.0.0",
+  "description": "my personnal cloud",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/negrie-a/myCloud.git"
+  },
+  "author": "Negrier Aurelien",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/negrie-a/myCloud/issues"
+  },
+  "homepage": "https://github.com/negrie-a/myCloud#readme",
+  "dependencies": {
+    "busboy": "^0.2.13",
+    "connect-busboy": "0.0.2",
+    "express": "^4.14.0",
+    "express-ws": "^2.0.0-rc.1",
+    "fs": "0.0.2",
+    "http": "0.0.0",
+    "multer": "^1.1.0",
+    "permission": "^1.0.4",
+    "sequelize": "^3.23.3",
+    "sequelize-cli": "^2.4.0",
+    "ws": "^1.1.0"
+  },
+  "devDependencies": {
+    "permission": "^1.0.4"
+  }
+}
