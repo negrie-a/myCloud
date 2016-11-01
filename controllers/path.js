@@ -25,7 +25,7 @@ var getContents = function (req, res) {
           folderArray.push(files[i]);
         }
       }
-      var text = JSON.stringify({files : filesArray, folders: folderArray});
+      var text = JSON.stringify({files : filesArray, folders: folderArray, path: req.body.path});
       return res.status(200).send(text);
   })
 }
