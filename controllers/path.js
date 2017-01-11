@@ -5,24 +5,33 @@ var path = require('path');
 
 var getContents = function (req, res) {
   if (!req.user) {
-    return res.status(403).json("User not connected");
+    return res.status(403).json("User is not connected");
   }
-  var pathFiles = path.resolve(__dirname) + "/../data/" + req.user.id + req.body.path;
+  var pathFiles = [global.rootPath, "data", req.user.id, req.body.path].createPath("/");
+
+  req.session.actualPath = req.body.path;
   fs.readdir(pathFiles, function(err, files) {
       if (err != null) {
         console.log(err);
         var error = JSON.stringify(err);
-        return res.status(404).send(error);
+        return res.status(404).send("Can not get content on the server");
       }
       var filesArray = [];
       var folderArray = [];
 
       for (var i = 0 ; i < files.length ; i++) {
-        if (fs.lstatSync(pathFiles + "/" + files[i]).isFile()) {
-          filesArray.push(files[i]);
+        var object = fs.lstatSync(pathFiles + "/" + files[i]);
+        if (object.isFile()) {
+
+          filesArray.push({
+            name: files[i],
+            size: object.size,
+            path: req.body.path
+          });
         }
         else {
-          folderArray.push(files[i]);
+          if (files[i] != ".diminutive") // don't send small picture hide in .diminutive
+            folderArray.push(files[i]);
         }
       }
       var text = JSON.stringify({files : filesArray, folders: folderArray, path: req.body.path});

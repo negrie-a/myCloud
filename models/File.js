@@ -33,6 +33,11 @@ module.exports = {
     pathServer: {
       type: Seq.STRING,
       allowNull: false
+    },
+    type: {
+      type: Seq.STRING,
+      allowNull: false,
+      defaultValue: "UPLOAD"
     }
 	},
 
@@ -55,7 +60,7 @@ module.exports = {
          var promise = new Promise( function(resolve, reject) {
            var pathFiles = [global.rootPath, "data", userId, self.pathServer, self.name].createPath("/"); // si le fichier y est pas ne pas renvoyé une erreur mais un message
            fs.stat(pathFiles, function (err, stats) {
-             if (err != null) {
+             if (err || !stats) {
                console.log(err);
                var error = JSON.stringify(err);
                reject(error);

@@ -1,3 +1,5 @@
+var path = require('path')
+
 if (!Array.prototype.replaceAll) {
     String.prototype.replaceAll = function(search, replacement) {
         var target = this;
@@ -24,4 +26,14 @@ if (!Array.prototype.createPath) {
 }
 else {
     console.log("[ERROR] : Array.prototype.createPath already exist")
+}
+
+if (!String.prototype.isImage) {
+    String.prototype.isImage = function () {
+        var suffix = path.extname(this.valueOf())
+        suffix = suffix.toLowerCase();
+        if (suffix == ".jpg" || suffix == ".png" || suffix == ".jpeg")
+            return true;
+        return false;
+    }
 }
