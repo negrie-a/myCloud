@@ -4,7 +4,7 @@ function permissions(level) {
 
 	if (level == 'member') {
 	    if (req.user) return next();
-	    return res.status(401).end();
+	    return res.status(403).json("User is not connected");
 	}
     }
 }

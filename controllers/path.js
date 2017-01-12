@@ -4,9 +4,6 @@ var fs = require('fs');
 var path = require('path');
 
 var getContents = function (req, res) {
-  if (!req.user) {
-    return res.status(403).json("User is not connected");
-  }
   var pathFiles = [global.rootPath, "data", req.user.id, req.body.path].createPath("/");
 
   req.session.actualPath = req.body.path;
@@ -43,7 +40,7 @@ module.exports = {
   '/contents': {
         post: {
             action: getContents,
-            level: 'public'
+            level: 'member'
         }
     }
 }

@@ -2,10 +2,6 @@ var tmS = require('tiny-models-sequelize');
 var fs = require('fs');
 
 var transfertHistoricToUser = function(req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
     var File = tmS.getModel('File');
     File.findAll({where: {fk_user_id: req.user.id}})
     .then(function (files) {
@@ -61,10 +57,6 @@ var transfertHistoricToUser = function(req, res) {
 }
 
 var updateHistoricById = function (req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
     var File = tmS.getModel('File');
     File.update(req.body, {where : {id: req.params.id}})
     .then(function(file) {
@@ -78,10 +70,6 @@ var updateHistoricById = function (req, res) {
 }
 
 var deleteHistoricFile = function (req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
     var File = tmS.getModel('File');
     File.findOne({where : {id: req.params.id, fk_user_id: req.user.id}})
     .then(function(file) {
@@ -102,18 +90,18 @@ module.exports = {
     '/': {
         get: {
             action: transfertHistoricToUser,
-            level: 'public'
+            level: 'member'
         }
     },
 
     '/:id': {
         put: {
             action: updateHistoricById,
-            level: 'public'
+            level: 'member'
         },
         delete: {
             action: deleteHistoricFile,
-            level: 'public'
+            level: 'member'
         }
     }
 }

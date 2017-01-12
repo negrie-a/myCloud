@@ -5,10 +5,7 @@ var fs = require('fs');
 var gm = require('gm').subClass({imageMagick: true});
 
 var initializeForUpload = function (req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-    req.body.fk_user_id = req.user.id;
+    req.body.fk_user_id = req.user.id
     var File = tmS.getModel('File');
 
     fs.access([global.rootPath, "data", req.user.id, req.body.pathServer, req.body.name].createPath("/"), function(err) {
@@ -31,10 +28,6 @@ var initializeForUpload = function (req, res) {
 }
 
 var initializeForDownload = function(req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
     req.query.size = Number(req.query.size)
 
     fileCreateHistoric(req.query, req.user.id)
@@ -47,10 +40,6 @@ var initializeForDownload = function(req, res) {
 }
 
 var upload = function(req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
     req.pipe(req.busboy);
     req.busboy.on('file', function (id, file, filename) {
         var File = tmS.getModel('File');
@@ -150,10 +139,6 @@ var createMiniaturePicture = function (pathFile, filename) {
 }
 
 var deleteFile = function (req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
     var path = [global.rootPath, "data", req.user.id, req.query.pathServer, req.query.name].createPath("/")
     fs.unlink(path, function(err) {
         if (err) {
@@ -169,10 +154,6 @@ var deleteFile = function (req, res) {
 }
 
 var getImageReduce = function (req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
     if (!req.params.name.isImage())
         return res.status(200).send("");
 
@@ -251,36 +232,36 @@ module.exports = {
     '/': {
         post: {
             action: initializeForUpload,
-            level: 'public'
+            level: 'member'
         },
         get: {
             action: initializeForDownload,
-            level: 'public'
+            level: 'member'
         },
         delete: {
             action: deleteFile,
-            level: 'public'
+            level: 'member'
         }
     },
 
     '/reduce/:name': {
         get: {
             action: getImageReduce,
-            level: 'public'
+            level: 'member'
         }
     },
 
     '/upload': {
         post: {
             action: upload,
-            level: 'public'
+            level: 'member'
         }
     },
 
     '/download': {
         get: {
             action: download,
-            level: 'public'
+            level: 'member'
         }
     }
 }
