@@ -46,61 +46,6 @@ var initializeForDownload = function(req, res) {
     })
 }
 
-var fileCreateHistoric = function(file, userId) {
-    file.fk_user_id = userId;
-    var File = tmS.getModel('File');
-
-    return new Promise(function(resolve, reject) {
-        File.findOne({where : {name: file.name, pathServer: file.pathServer, fk_user_id: file.fk_user_id}})
-        .then(function(fileAlreadyCreate) {
-            if (fileAlreadyCreate != null) {
-                var idDeleted = fileAlreadyCreate.id;
-                fileAlreadyCreate.destroy()
-                .then(function () {
-                    File.create(file)
-                    .then(function (fileCreate) {
-                        fileCreate["idDeleted"] = idDeleted
-                        resolve({
-                            idDeleted: idDeleted,
-                            id: fileCreate.id,
-                            size: fileCreate.size,
-                            name: fileCreate.name,
-                            status: fileCreate.status,
-                            pathServer: fileCreate.pathServer,
-                            pathDevice: fileCreate.pathDevice,
-                            type: fileCreate.type,
-                            fk_user_id: fileCreate.fk_user_id,
-                            updatedAt: fileCreate.updatedAt,
-                            createdAt: fileCreate.createdAt
-                        })
-                    })
-                    .catch(function(err) {
-                        console.log(err)
-                        reject("Can not create file in historic");
-                    });
-                })
-                .catch(function(err) {
-                    console.log(err)
-                    reject("Can not delete " + fileAlreadyCreate.name + " in the historic")
-                })
-            }
-            else {
-                File.create(file).then(function (fileCreate) {
-                    resolve(fileCreate);
-                })
-                .catch(function(err) {
-                    console.log(err)
-                    reject("Can not create file in historic");
-                });
-            }
-        })
-        .catch(function(err) {
-            console.log(err)
-            reject("Can not find file in MYSQL historic on server");
-        })
-    })
-}
-
 var upload = function(req, res) {
     if (!req.user) {
         return res.status(403).json("User is not connected");
@@ -204,65 +149,6 @@ var createMiniaturePicture = function (pathFile, filename) {
     return promiseTmp;
 }
 
-var transfertHistoricToUser = function(req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
-    var File = tmS.getModel('File');
-    File.findAll({where: {fk_user_id: req.user.id}})
-    .then(function (files) {
-        files = files;
-        var promises = []
-        for (var i = 0 ; i < files.length ; i++) {
-            var promiseTmp = new Promise(function(resolve, reject) {
-                var file = files[i];
-                console.log(file)
-                fs.access([global.rootPath, "data", req.user.id, file.pathServer, file.name].createPath("/"), function(err) {
-
-                    // if file exist
-                    if (!err) {
-                        file.getActualSize(req.user.id)
-                        .then(function(actualSize) {
-                            file.dataValues.actualSize = actualSize;
-                            resolve();
-                        })
-                        .catch(function (err) {
-                            console.log(err)
-                            reject(err);
-                        })
-                    }
-
-                    // if file doesn't exist
-                    else {
-                        file.update({status : "Delete"})
-                        .then(function (rep) {
-                            file.status = "Delete"
-                            resolve();
-                        })
-                        .catch(function (err) {
-                            console.log(err)
-                            return res.status(404).send("[ERROR] : Update file" + file.name);
-                        })
-                    }
-                })
-            })
-            promises.push(promiseTmp);
-        }
-        Promise.all(promises).then(function() {
-            return res.status(200).send(files);
-        })
-        .catch(function(err) {
-            console.log(err)
-            return res.status(404).send("Can not send historic to user");
-        })
-    })
-    .catch(function (err) {
-        console.log(err)
-        return res.status(404).send("Can not find file in historic");
-    })
-}
-
 var deleteFile = function (req, res) {
     if (!req.user) {
         return res.status(403).json("User is not connected");
@@ -279,27 +165,6 @@ var deleteFile = function (req, res) {
             name: req.query.name,
             msg: req.query.name + " has been deleted"
         }));
-    })
-}
-
-var deleteHistoricFile = function (req, res) {
-    if (!req.user) {
-        return res.status(403).json("User is not connected");
-    }
-
-    var File = tmS.getModel('File');
-    File.findOne({where : {name: req.query.name, pathServer: req.query.pathServer, fk_user_id: req.user.id}})
-    .then(function(file) {
-        if (file != null)
-            file.destroy().then(function (rep) {
-                return res.status(200).send(JSON.stringify(file));
-            })
-        else
-            return res.status(400).send("This file does not exist in the historic");
-    })
-    .catch(function(err) {
-        console.log(err)
-        return res.status(404).send("Can not delete historic file");
     })
 }
 
@@ -324,6 +189,61 @@ var getImageReduce = function (req, res) {
             return ;
         }
         res.status(200).sendFile(pathFile)
+    })
+}
+
+var fileCreateHistoric = function(file, userId) {
+    file.fk_user_id = userId;
+    var File = tmS.getModel('File');
+
+    return new Promise(function(resolve, reject) {
+        File.findOne({where : {name: file.name, pathServer: file.pathServer, fk_user_id: file.fk_user_id}})
+        .then(function(fileAlreadyCreate) {
+            if (fileAlreadyCreate != null) {
+                var idDeleted = fileAlreadyCreate.id;
+                fileAlreadyCreate.destroy()
+                .then(function () {
+                    File.create(file)
+                    .then(function (fileCreate) {
+                        fileCreate["idDeleted"] = idDeleted
+                        resolve({
+                            idDeleted: idDeleted,
+                            id: fileCreate.id,
+                            size: fileCreate.size,
+                            name: fileCreate.name,
+                            status: fileCreate.status,
+                            pathServer: fileCreate.pathServer,
+                            pathDevice: fileCreate.pathDevice,
+                            type: fileCreate.type,
+                            fk_user_id: fileCreate.fk_user_id,
+                            updatedAt: fileCreate.updatedAt,
+                            createdAt: fileCreate.createdAt
+                        })
+                    })
+                    .catch(function(err) {
+                        console.log(err)
+                        reject("Can not create file in historic");
+                    });
+                })
+                .catch(function(err) {
+                    console.log(err)
+                    reject("Can not delete " + fileAlreadyCreate.name + " in the historic")
+                })
+            }
+            else {
+                File.create(file).then(function (fileCreate) {
+                    resolve(fileCreate);
+                })
+                .catch(function(err) {
+                    console.log(err)
+                    reject("Can not create file in historic");
+                });
+            }
+        })
+        .catch(function(err) {
+            console.log(err)
+            reject("Can not find file in MYSQL historic on server");
+        })
     })
 }
 
@@ -360,18 +280,6 @@ module.exports = {
     '/download': {
         get: {
             action: download,
-            level: 'public'
-        }
-    },
-
-    '/historic': {
-        get: {
-            action: transfertHistoricToUser,
-            level: 'public'
-        },
-
-        delete: {
-            action: deleteHistoricFile,
             level: 'public'
         }
     }
