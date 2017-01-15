@@ -73,6 +73,10 @@ var upload = function(req, res) {
                 });
             });
 
+            file.on('close', function () {
+                console.log("CLOSE")
+            });
+
             file.on('end', function () {
                 return res.status(200).send({id : id});
             });
@@ -101,13 +105,14 @@ var download = function(req, res) {
                 throw err;
             }
         } else {
-            console.log(position)
             var buffer = new Buffer(bufferSize)
             fs.read(fd, buffer, 0, bufferSize, position, function (err, bytesRead, buffer) {
                 if (err) {
+                    fs.close(fd)
                     console.log(err)
                     return res.status(404).json("Cannot read file - " + pathFile)
                 }
+                fs.close(fd)
                 res.status(200).end(buffer);
             })
         }
