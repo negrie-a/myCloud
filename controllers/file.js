@@ -43,14 +43,25 @@ var upload = function(req, res) {
     req.pipe(req.busboy);
     req.busboy.on('file', function (id, file, filename) {
         var File = tmS.getModel('File');
-
+        var bufferList = []
+        var bufferListSize = 0
         File.findById(id)
         .then(function(rep) {
             var pathFile = [global.rootPath, "data", req.user.id, rep.pathServer, filename].createPath("/");
 
             file.on('data', (chunk) => {
                 console.log(`Received ${chunk.length} bytes of data.`);
-                fs.appendFile(pathFile, chunk, function (err) {
+                bufferList.push(chunk)
+                bufferListSize += chunk.length
+            });
+
+            file.on('close', function () {
+                console.log("CLOSE")
+            });
+
+            file.on('end', function () {
+                const data = Buffer.concat(bufferList, bufferListSize)
+                fs.appendFile(pathFile, data, function (err) {
                     if (err) {
                         console.log(err)
                         return res.status(404).send("Can not append data in file ");
@@ -61,25 +72,26 @@ var upload = function(req, res) {
                                 console.log(err)
                                 return res.status(404).send("Can not get stat of file " + filename);
                             }
-                            if (stats.size == rep.size) {
+                            if (stats.size === rep.size) {
                                 createMiniaturePicture([global.rootPath, "data", req.user.id, rep.pathServer].createPath("/"), filename)
+                                .then(function () {
+                                    return res.status(200).send({id : id});
+                                })
                                 .catch(function (err) {
                                     console.log(err);
                                     return res.status(404).send("Can not create miniature picture of " + filename);
                                 });
                             }
+                            else {
+                                return res.status(200).send({id : id});
+                            }
                         });
                     }
+                    else {
+                        return res.status(200).send({id : id});
+                    }
                 });
-            });
-
-            file.on('close', function () {
-                console.log("CLOSE")
-            });
-
-            file.on('end', function () {
-                return res.status(200).send({id : id});
-            });
+            })
         })
         .catch(function (err) {
             console.log(err)
@@ -126,18 +138,20 @@ var createMiniaturePicture = function (pathFile, filename) {
             if (err && err.code !== "EEXIST") {
                 console.log(err)
                 reject(err)
-                return;
             }
-            gm([pathFile, filename].createPath("/"))
-            .resize('200', '200')
-            .write([miniaturePath, filename].createPath("/"), function (err) {
-                if (err) {
-                    console.log(err);
-                    reject(err)
-                    return;
-                }
-                resolve();
-            })
+            else {
+                gm([pathFile, filename].createPath("/"))
+                .resize('200', '200')
+                .write([miniaturePath, filename].createPath("/"), function (err) {
+                    if (err) {
+                        console.log(err);
+                        reject(err)
+                    }
+                    else {
+                        resolve();
+                    }
+                })
+            }
         })
     })
     return promiseTmp;
@@ -160,7 +174,7 @@ var deleteFile = function (req, res) {
 
 var getImageReduce = function (req, res) {
     if (!req.params.name.isImage())
-        return res.status(200).send("");
+    return res.status(200).send("");
 
     var pathFile = [global.rootPath, "data", req.user.id, req.session.actualPath, ".diminutive", req.params.name].createPath("/");
     fs.access(pathFile, function (err) {
@@ -183,7 +197,7 @@ var fileCreateHistoric = function(file, userId) {
     var File = tmS.getModel('File');
 
     return new Promise(function(resolve, reject) {
-        File.findOne({where : {name: file.name, pathServer: file.pathServer, fk_user_id: file.fk_user_id}})
+        File.findOne({where : {name: file.name, pathServer: file.pathServer, fk_user_id: file.fk_user_id, type: file.type}})
         .then(function(fileAlreadyCreate) {
             if (fileAlreadyCreate != null) {
                 var idDeleted = fileAlreadyCreate.id;
@@ -248,7 +262,6 @@ module.exports = {
             level: 'member'
         }
     },
-
     '/reduce/:name': {
         get: {
             action: getImageReduce,

@@ -11,6 +11,8 @@ var create = function (req, res) {
         }
 
         var value = {
+            name: req.body.name,
+            pathServer: req.body.pathServer,
             msg : req.body.name + "has been created"
         }
         return res.status(200).send(value)
