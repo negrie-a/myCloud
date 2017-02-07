@@ -32,6 +32,7 @@
     "permission": "^1.0.4",
     "sequelize": "^3.23.3",
     "sequelize-cli": "^2.4.0",
+    "walk": "^2.3.9",
     "ws": "^1.1.0"
   },
   "devDependencies": {

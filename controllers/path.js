@@ -2,11 +2,11 @@ var tmS = require('tiny-models-sequelize');
 var passport = require('passport');
 var fs = require('fs');
 var path = require('path');
+var walk    = require('walk');
 
 var getContents = function (req, res) {
   var pathFiles = [global.rootPath, "data", req.user.id, req.body.path].createPath("/");
 
-  req.session.actualPath = req.body.path;
   fs.readdir(pathFiles, function(err, files) {
       if (err != null) {
         console.log(err);
@@ -36,11 +36,40 @@ var getContents = function (req, res) {
   })
 }
 
+var getRepositoryTree = function(req, res) {
+  var walker  = walk.walk([global.rootPath, "data", 2].createPath("/"), { followLinks: false });
+  var files = []
+  walker.on('directory', function(root, stat, next) {
+      if (stat.name !== ".diminutive") {
+        var path = root.replace([global.rootPath, "data", 2].createPath("/"), '')
+        var filePath = path + '/' + stat.name
+        files.push(filePath.slice(1));
+      }
+      next();
+  });
+
+  walker.on("errors", function (root, nodeStatsArray, next) {
+    console.log("[ERROR] : getRepositoryTree : ");
+    next();
+  });
+
+  walker.on('end', function() {
+      res.status(200).send(JSON.stringify(files))
+  });
+}
+
 module.exports = {
   '/contents': {
         post: {
             action: getContents,
             level: 'member'
+        }
+    },
+
+  '/repositoryTree' : {
+        get: {
+          action: getRepositoryTree,
+          level: 'public'
         }
     }
 }

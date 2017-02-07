@@ -40,62 +40,57 @@ var initializeForDownload = function(req, res) {
 }
 
 var upload = function(req, res) {
+    var pathServer = req.headers['path-server'];
+    var totalSize = req.headers['total-size'];
+
     req.pipe(req.busboy);
     req.busboy.on('file', function (id, file, filename) {
         var File = tmS.getModel('File');
         var bufferList = []
         var bufferListSize = 0
-        File.findById(id)
-        .then(function(rep) {
-            var pathFile = [global.rootPath, "data", req.user.id, rep.pathServer, filename].createPath("/");
+        var pathFile = [global.rootPath, "data", req.user.id, pathServer, filename].createPath("/");
 
-            file.on('data', (chunk) => {
-                console.log(`Received ${chunk.length} bytes of data.`);
-                bufferList.push(chunk)
-                bufferListSize += chunk.length
-            });
+        file.on('data', (chunk) => {
+            bufferList.push(chunk)
+            bufferListSize += chunk.length
+        });
 
-            file.on('close', function () {
-                console.log("CLOSE")
-            });
+        file.on('close', function () {
+            console.log("CLOSE")
+        });
 
-            file.on('end', function () {
-                const data = Buffer.concat(bufferList, bufferListSize)
-                fs.appendFile(pathFile, data, function (err) {
-                    if (err) {
-                        console.log(err)
-                        return res.status(404).send("Can not append data in file ");
-                    }
-                    if (filename.isImage()) {
-                        fs.stat(pathFile, function (err, stats) {
-                            if (err) {
-                                console.log(err)
-                                return res.status(404).send("Can not get stat of file " + filename);
-                            }
-                            if (stats.size === rep.size) {
-                                createMiniaturePicture([global.rootPath, "data", req.user.id, rep.pathServer].createPath("/"), filename)
-                                .then(function () {
-                                    return res.status(200).send({id : id});
-                                })
-                                .catch(function (err) {
-                                    console.log(err);
-                                    return res.status(404).send("Can not create miniature picture of " + filename);
-                                });
-                            }
-                            else {
+        file.on('end', function () {
+            const data = Buffer.concat(bufferList, bufferListSize)
+            fs.appendFile(pathFile, data, function (err) {
+                if (err) {
+                    console.log(err)
+                    return res.status(404).send("Can not append data in file ");
+                }
+                if (filename.isImage()) {
+                    fs.stat(pathFile, function (err, stats) {
+                        if (err) {
+                            console.log(err)
+                            return res.status(404).send("Can not get stat of file " + filename);
+                        }
+                        if (stats.size === totalSize) {
+                            createMiniaturePicture([global.rootPath, "data", req.user.id, pathServer].createPath("/"), filename)
+                            .then(function () {
                                 return res.status(200).send({id : id});
-                            }
-                        });
-                    }
-                    else {
-                        return res.status(200).send({id : id});
-                    }
-                });
-            })
-        })
-        .catch(function (err) {
-            console.log(err)
-            return res.status(404).send("Can not find file in MYSQL historic on server");
+                            })
+                            .catch(function (err) {
+                                console.log(err);
+                                return res.status(404).send("Can not create miniature picture of " + filename);
+                            });
+                        }
+                        else {
+                            return res.status(200).send({id : id});
+                        }
+                    });
+                }
+                else {
+                    return res.status(200).send({id : id});
+                }
+            });
         })
     });
 }
@@ -164,11 +159,17 @@ var deleteFile = function (req, res) {
             console.log(err)
             return res.status(404).send("Can not delete file");
         }
-        return res.status(200).send(JSON.stringify({
-            pathServer: req.query.pathServer,
-            name: req.query.name,
-            msg: req.query.name + " has been deleted"
-        }));
+        fs.unlink([global.rootPath, "data", req.user.id, req.query.pathServer, req.query.name, ".diminutive"].createPath("/"), function(err) {
+            if (err) {
+                console.log(err)
+                return res.status(404).send("Can not delete file");
+            }
+            return res.status(200).send(JSON.stringify({
+                pathServer: req.query.pathServer,
+                name: req.query.name,
+                msg: req.query.name + " has been deleted"
+            }));
+        })
     })
 }
 
@@ -176,10 +177,10 @@ var getImageReduce = function (req, res) {
     if (!req.params.name.isImage())
     return res.status(200).send("");
 
-    var pathFile = [global.rootPath, "data", req.user.id, req.session.actualPath, ".diminutive", req.params.name].createPath("/");
+    var pathFile = [global.rootPath, "data", req.user.id, req.query.pathServer, ".diminutive", req.params.name].createPath("/");
     fs.access(pathFile, function (err) {
         if (err) {
-            createMiniaturePicture([global.rootPath, "data", req.user.id, req.session.actualPath].createPath("/"), req.params.name)
+            createMiniaturePicture([global.rootPath, "data", req.user.id, req.query.pathServer].createPath("/"), req.params.name)
             .then(function () {
                 return res.status(200).sendFile(pathFile);
             })
@@ -247,6 +248,38 @@ var fileCreateHistoric = function(file, userId) {
     })
 }
 
+var rename = function(req, res) {
+    fs.access([global.rootPath, "data", req.user.id, req.body.newPath].createPath("/"), function(err) {
+
+        //check if file exist
+        if (!err) {
+            req.body.msg = req.body.oldPath + " already exists";
+            return res.status(202).send(JSON.stringify(req.body));
+        }
+
+        fs.rename([global.rootPath, "data", req.user.id, req.body.oldPath].createPath("/"), [global.rootPath, "data", req.user.id, req.body.newPath].createPath("/"), (err) => {
+            if (err) {
+                console.log(err)
+                return res.status(404).send("Can not rename the file " + req.body.oldPath)
+            }
+
+            var oldFileInfo = path.parse(req.body.oldPath)
+            var newFileInfo = path.parse(req.body.newPath)
+            fs.rename([global.rootPath, "data", req.user.id, oldFileInfo.dir, ".diminutive", oldFileInfo.base].createPath("/"), [global.rootPath, "data", req.user.id, newFileInfo.dir, ".diminutive", newFileInfo.base].createPath("/"), (err) => {
+                if (err) {
+                    console.log(err)
+                    return res.status(404).send("Can not rename miniature of file " + req.body.oldPath)
+                }
+
+                res.status(200).send(JSON.stringify({
+                    oldPath: req.body.oldPath,
+                    newPath: req.body.newPath
+                }))
+            })
+        });
+    })
+}
+
 module.exports = {
     '/': {
         post: {
@@ -279,6 +312,13 @@ module.exports = {
     '/download': {
         get: {
             action: download,
+            level: 'member'
+        }
+    },
+
+    '/rename': {
+        put: {
+            action: rename,
             level: 'member'
         }
     }
