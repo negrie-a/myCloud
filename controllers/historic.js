@@ -61,11 +61,11 @@ var updateHistoricById = function (req, res) {
     File.update(req.body, {where : {id: req.params.id}})
     .then(function(file) {
         console.log(file)
-        return res.status(200).send(JSON.stringify(file));
+        return res.status(200).send(file);
     })
     .catch(function(err) {
         console.log(err)
-        return res.status(404).send(JSON.stringify(err));
+        return res.status(404).send(err);
     })
 }
 
@@ -75,7 +75,7 @@ var deleteHistoricFile = function (req, res) {
     .then(function(file) {
         if (file != null)
             file.destroy().then(function (rep) {
-                return res.status(200).send(JSON.stringify(file));
+                return res.status(200).send(file);
             })
         else
             return res.status(400).send("This file does not exist in the historic");

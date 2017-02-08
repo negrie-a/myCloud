@@ -13,13 +13,13 @@ var initializeForUpload = function (req, res) {
         //check if file exist
         if (!err) {
             req.body.msg = req.body.name + " already exists";
-            return res.status(202).send(JSON.stringify(req.body));
+            return res.status(202).send(req.body);
         }
         //if file does not exist
         fileCreateHistoric(req.body, req.user.id)
         .then(function (fileCreate) {
             fs.createWriteStream([global.rootPath, "data", req.user.id, fileCreate.pathServer, fileCreate.name].createPath("/"));
-            return res.status(200).send(JSON.stringify(fileCreate));
+            return res.status(200).send(fileCreate);
         })
         .catch(function (err) {
             return res.status(404).json(err);
@@ -32,7 +32,7 @@ var initializeForDownload = function(req, res) {
 
     fileCreateHistoric(req.query, req.user.id)
     .then(function (fileCreate) {
-        return res.status(200).send(JSON.stringify(fileCreate));
+        return res.status(200).send(fileCreate);
     })
     .catch(function (err) {
         return res.status(404).json(err);
@@ -160,15 +160,18 @@ var deleteFile = function (req, res) {
             return res.status(404).send("Can not delete file");
         }
         fs.unlink([global.rootPath, "data", req.user.id, req.query.pathServer, req.query.name, ".diminutive"].createPath("/"), function(err) {
-            if (err) {
-                console.log(err)
-                return res.status(404).send("Can not delete file");
-            }
-            return res.status(200).send(JSON.stringify({
+
+            /* ERREUR NON CATCH -> VERIFIER QU'IL FAIT PARTIT D'UN FICHIER A MINUATURISER */
+
+            // if (err) {
+            //     console.log(err)
+            //     return res.status(404).send("Can not delete file");
+            // }
+            return res.status(200).send({
                 pathServer: req.query.pathServer,
                 name: req.query.name,
                 msg: req.query.name + " has been deleted"
-            }));
+            });
         })
     })
 }
@@ -254,7 +257,7 @@ var rename = function(req, res) {
         //check if file exist
         if (!err) {
             req.body.msg = req.body.oldPath + " already exists";
-            return res.status(202).send(JSON.stringify(req.body));
+            return res.status(202).send(req.body);
         }
 
         fs.rename([global.rootPath, "data", req.user.id, req.body.oldPath].createPath("/"), [global.rootPath, "data", req.user.id, req.body.newPath].createPath("/"), (err) => {
@@ -266,15 +269,18 @@ var rename = function(req, res) {
             var oldFileInfo = path.parse(req.body.oldPath)
             var newFileInfo = path.parse(req.body.newPath)
             fs.rename([global.rootPath, "data", req.user.id, oldFileInfo.dir, ".diminutive", oldFileInfo.base].createPath("/"), [global.rootPath, "data", req.user.id, newFileInfo.dir, ".diminutive", newFileInfo.base].createPath("/"), (err) => {
-                if (err) {
-                    console.log(err)
-                    return res.status(404).send("Can not rename miniature of file " + req.body.oldPath)
-                }
 
-                res.status(200).send(JSON.stringify({
+                /* ERREUR NON CATCH -> VERIFIER QU'IL FAIT PARTIT D'UN FICHIER A MINUATURISER */
+
+                // if (err) {
+                //     console.log(err)
+                //     return res.status(404).send("Can not rename miniature of file " + req.body.oldPath)
+                // }
+
+                res.status(200).send({
                     oldPath: req.body.oldPath,
                     newPath: req.body.newPath
-                }))
+                })
             })
         });
     })

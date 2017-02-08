@@ -10,7 +10,6 @@ var getContents = function (req, res) {
   fs.readdir(pathFiles, function(err, files) {
       if (err != null) {
         console.log(err);
-        var error = JSON.stringify(err);
         return res.status(404).send("Can not get content on the server");
       }
       var filesArray = [];
@@ -31,8 +30,7 @@ var getContents = function (req, res) {
             folderArray.push(files[i]);
         }
       }
-      var text = JSON.stringify({files : filesArray, folders: folderArray, path: req.body.path});
-      return res.status(200).send(text);
+      return res.status(200).send({files : filesArray, folders: folderArray, path: req.body.path});
   })
 }
 
@@ -54,7 +52,7 @@ var getRepositoryTree = function(req, res) {
   });
 
   walker.on('end', function() {
-      res.status(200).send(JSON.stringify(files))
+      res.status(200).send(files)
   });
 }
 
