@@ -10,7 +10,6 @@ var transfertHistoricToUser = function(req, res) {
         for (var i = 0 ; i < files.length ; i++) {
             var promiseTmp = new Promise(function(resolve, reject) {
                 var file = files[i];
-                console.log(file)
                 fs.access([global.rootPath, "data", req.user.id, file.pathServer, file.name].createPath("/"), function(err) {
 
                     // if file exist
@@ -60,7 +59,6 @@ var updateHistoricById = function (req, res) {
     var File = tmS.getModel('File');
     File.update(req.body, {where : {id: req.params.id}})
     .then(function(file) {
-        console.log(file)
         return res.status(200).send(file);
     })
     .catch(function(err) {
