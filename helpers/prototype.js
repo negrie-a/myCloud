@@ -32,7 +32,23 @@ if (!String.prototype.isImage) {
     String.prototype.isImage = function () {
         var suffix = path.extname(this.valueOf())
         suffix = suffix.toLowerCase();
-        if (suffix == ".jpg" || suffix == ".png" || suffix == ".jpeg")
+
+        var suffixImage = [".ani", ".bmp", ".cal", ".fax", ".gif", ".img", ".jbg", ".jpe", ".jpeg", ".jpg", ".mac", ".pmb", ".pcd", ".pcx", ".pct", ".pgm", ".png", ".ppm", ".psd", ".ras", ".tga", ".tiff", ".wmf"]
+
+        if (suffixImage.indexOf(suffix) >= 0)
+            return true;
+        return false;
+    }
+}
+
+if (!String.prototype.isMovie) {
+    String.prototype.isMovie = function () {
+        var suffix = path.extname(this.valueOf())
+        suffix = suffix.toLowerCase();
+
+        var suffixImage = [".webm", ".mkv", ".flv", ".flv", ".vob", ".ogv", ".ogg", ".drc", ".gifv", ".mng", ".avi", ".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".asf", ".amv", ".mp4", ".m4v", ".m4p", ".mpg", ".mp2", ".mpeg", ".mpe", ".mpv", ".mpg", ".mpeg", ".m2v", ".m4v", "	.svi", ".3gp", ".3g2", ".mxf", ".roq", ".nsv", ".flv", ".f4v", ".f4p", ".f4a", ".f4b"]
+
+        if (suffixImage.indexOf(suffix) >= 0)
             return true;
         return false;
     }

@@ -19,6 +19,7 @@
   "dependencies": {
     "busboy": "^0.2.13",
     "connect-busboy": "0.0.2",
+    "diskspace": "^1.0.3",
     "express": "^4.14.0",
     "express-ws": "^2.0.0-rc.1",
     "fs": "0.0.2",
