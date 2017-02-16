@@ -4,7 +4,10 @@ module.exports = {
 
 	model: {
 		email: {type : Seq.STRING},
-		password: {type : Seq.STRING}
+		password: {type : Seq.STRING},
+		firstName: {type : Seq.STRING},
+		lastName: {type : Seq.STRING},
+		pathProfilPicture: {type : Seq.STRING}
 	},
 
 	relations : {
