@@ -4,22 +4,15 @@ module.exports = function(grunt) {
         kill: {
             cmd: 'killall node'
         },
-        exec: {
-            'stop-node': {
-                cmd: 'killall node'
-            },
-            'start-node': {
-                cmd: 'node app.js'
-            }
-        },
         nodemon: {
             dev: {
-                script: 'app.js'
+                script: 'app.js',
+                options: {
+                    watch: ['controllers/*', 'core/*', 'helpers/*', 'models/*'],
+                    delay: 1000,
+                    legacyWatch: true
+                }
             }
-        },
-        watch: {
-            files: ['./controllers/*', './core/*', './helpers/*', './models/*'],
-            tasks: ['nodemon']
         }
     })
 
