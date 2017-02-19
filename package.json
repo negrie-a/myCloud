@@ -30,6 +30,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "mycloud": "./node_modules/sequelize-cli/bin/sequelize db:migrate  --config ./config/database.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
