@@ -20,7 +20,7 @@ module.exports = {
       }
     );
 
-    queryInterface.addColumn(
+    return queryInterface.addColumn(
       'User',
       'pathProfilPicture',
       {
