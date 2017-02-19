@@ -9,25 +9,23 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false
             }
-        ).then(function() {
-            queryInterface.addColumn(
-                'User',
-                'lastName',
-                {
-                    type: Sequelize.STRING,
-                    allowNull: false
-                }
-            ).then(function() {
-                queryInterface.addColumn(
-                    'User',
-                    'pathProfilPicture',
-                    {
-                        type: Sequelize.STRING,
-                        allowNull: true
-                    }
-                );
-            })
-        })
+        )
+        queryInterface.addColumn(
+            'User',
+            'lastName',
+            {
+                type: Sequelize.STRING,
+                allowNull: false
+            }
+        )
+        queryInterface.addColumn(
+            'User',
+            'pathProfilPicture',
+            {
+                type: Sequelize.STRING,
+                allowNull: true
+            }
+        );
     },
     /*
     Add altering commands here.
