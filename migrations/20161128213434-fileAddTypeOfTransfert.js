@@ -3,7 +3,7 @@
 module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.addColumn(
-      'file',
+      'File',
       'type',
       {
         type: Sequelize.STRING,

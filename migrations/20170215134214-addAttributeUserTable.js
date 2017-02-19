@@ -9,25 +9,25 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       }
-    );
-
-    queryInterface.addColumn(
-      'User',
-      'lastName',
-      {
-        type: Sequelize.STRING,
-        allowNull: false
-      }
-    );
-
-    return queryInterface.addColumn(
-      'User',
-      'pathProfilPicture',
-      {
-        type: Sequelize.STRING,
-        allowNull: true
-      }
-    );
+    ).then(function() {
+      queryInterface.addColumn(
+        'User',
+        'lastName',
+        {
+          type: Sequelize.STRING,
+          allowNull: false
+        }
+      ).then(function() {
+        queryInterface.addColumn(
+          'User',
+          'pathProfilPicture',
+          {
+            type: Sequelize.STRING,
+            allowNull: true
+          }
+        );
+      })
+    }
     /*
     Add altering commands here.
     Return a promise to correctly handle asynchronicity.
