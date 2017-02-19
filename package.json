@@ -1,42 +1,45 @@
 {
-  "name": "mycloud",
+  "name": "mycloud_server",
   "version": "1.0.0",
-  "description": "my personnal cloud",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/negrie-a/myCloud.git"
-  },
-  "author": "Negrier Aurelien",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/negrie-a/myCloud/issues"
-  },
-  "homepage": "https://github.com/negrie-a/myCloud#readme",
+  "description": "Server my_cloud project",
+  "main": "Gruntfile.js",
   "dependencies": {
+    "body-parser": "^1.15.1",
     "busboy": "^0.2.13",
-    "connect-busboy": "0.0.2",
+    "connect-busboy": "^0.0.2",
+    "connect-flash": "^0.1.1",
     "diskspace": "^1.0.3",
-    "express": "^4.14.0",
-    "express-ws": "^2.0.0-rc.1",
-    "fs": "0.0.2",
+    "express-controllers-loader": "^1.0.3",
+    "express-session": "^1.13.0",
+    "fs": "^0.0.2",
     "gm": "^1.23.0",
     "grunt": "^1.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-exec": "^1.0.1",
     "grunt-nodemon": "^0.4.2",
-    "http": "0.0.0",
-    "multer": "^1.1.0",
+    "mysql": "^2.13.0",
+    "passport": "^0.3.2",
+    "passport-google-openidconnect": "^0.0.4",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
     "permission": "^1.0.4",
-    "sequelize": "^3.23.3",
     "sequelize-cli": "^2.4.0",
-    "walk": "^2.3.9",
-    "ws": "^1.1.0"
+    "session-file-store": "^0.2.1",
+    "tiny-models-sequelize": "^1.0.8",
+    "walk": "^2.3.9"
   },
-  "devDependencies": {
-    "permission": "^1.0.4"
-  }
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/negrie-a/myCloud-server.git"
+  },
+  "author": "Negrier Aurelien",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/negrie-a/myCloud-server/issues"
+  },
+  "homepage": "https://github.com/negrie-a/myCloud-server#readme"
 }
