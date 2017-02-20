@@ -102,7 +102,7 @@ var download = function(req, res) {
 
     var File = tmS.getModel('File');
 
-    var pathFile = [global.rootPath, "data", 2, pathFile].createPath("/");
+    var pathFile = [global.rootPath, "data", req.user.id, pathFile].createPath("/");
     fs.open(pathFile, 'r', (err, fd) => {
         if (err) {
             if (err.code === "ENOENT") {
