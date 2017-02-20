@@ -19,7 +19,7 @@ var connection = function (req, res, next) {
                 return next(err);
             }
 
-            const disk = exec('df -h -m /', (err, stdout, stderr) => {
+            const disk = exec('df -h -m / | grep /', (err, stdout, stderr) => {
                 if (err) {
                     console.log(err)
                 }
