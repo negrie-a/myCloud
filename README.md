@@ -3,6 +3,9 @@
 MyCloud is an application which allows you to host your own Cloud on your server.   
 Thanks to this app, you can download, upload and manage your files.
 
+Server is based on NodeJS
+Software is based on Qt/C++
+
 ## Motivation
 
 Before beginning this project, I bought a personal cloud storage already created, but the software was very ugly and I cannot improve or modify anything. Because of that, I decided to create my own cloud to be very flexible
