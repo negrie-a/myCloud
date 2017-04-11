@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Server my_cloud project",
   "main": "Gruntfile.js",
+  "dataPath": "/Users/Aurelien/Desktop",
   "dependencies": {
     "body-parser": "^1.15.1",
     "busboy": "^0.2.13",

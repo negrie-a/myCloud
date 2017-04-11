@@ -10,6 +10,7 @@ var expressWs = require('express-ws')(app);
 var session = require('express-session')
 var busboy = require('connect-busboy');
 var FileStore   = require('session-file-store')(session);
+var config = require('./package');
 
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
@@ -25,9 +26,13 @@ app.use(session({
 ////////////
 // GLOBAL //
 ////////////
-var path = require('path');
-global.rootPath = path.resolve(__dirname);
 
+if (config.dataPath)
+    global.rootPath = config.dataPath
+else
+    global.rootPath = path.resolve(__dirname);
+
+// create dossier data et profil_picture dans la global.rootPath
 
 require(path.join(__dirname, 'core', 'authentification.js'));
 
