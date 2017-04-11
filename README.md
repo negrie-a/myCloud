@@ -64,11 +64,11 @@ You have to install all libraries in order myCloud server work well.
   MyCloud server use [grunt](http://gruntjs.com/) the JavaScript Task Runner to start the server.
   
   ```
-   // ONLY on Linux
+   // ONLY on Linux one time
    sh ./script/linux-config.sh
    
-   
-   npm install
+   // Start server
+   grunt
 ```
   
 ## Built With
